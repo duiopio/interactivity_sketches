@@ -1,12 +1,12 @@
 import { Points, Lines, Rects, Circles, Vectors } from "ixfx/geometry.js";
-import { interval } from "ixfx/trackers.js";
+import { points } from "ixfx/trackers.js";
 import { Forces } from "ixfx/modulation.js";
 import * as Numbers from "ixfx/numbers.js";
 import * as Things from "./thing.js";
 import * as Util from "./util.js";
 
 const settings = Object.freeze({
-  tracker: interval({ sampleLimit: 3000 }),
+  tracker: points({ sampleLimit: 3000 }),
   nrOfThings: 50,
   /** This value is used to determine the treshold
    * for the minumum number of fingers required to register
@@ -70,7 +70,6 @@ function use() {
   const gestureCurrentPosition = { x: rect.x, y: rect.y };
   const line = Lines.fromPoints(gestureStartPosition, gestureCurrentPosition);
   const offsetVector = Vectors.fromLineCartesian(line);
-  const force = Forces.accelerationForce(offsetVector, "dampen")
 
   saveState({ offsetVector });
 
@@ -224,7 +223,7 @@ function updateRect() {
   const { tracker } = settings;
   let rect;
   if (tracker.size >= settings.minNumberOfFingerForGesture) {
-    const points = /** @type Array<Points.Point> */([...tracker.valuesByAge()])
+    const points = /** @type Array<Points> */ ([...tracker.valuesByAge()]);
     rect = Points.bbox(...points);
   } else {
     rect = undefined;
@@ -239,7 +238,7 @@ function updateRect() {
 */
 function updateGestureStartPosition() {
   let gestureStartPosition = undefined;
-  const points = /** @type Array<Points.Point> */([...settings.tracker.valuesByAge()]);
+  const points = /** @type Array<Points> */ ([...settings.tracker.valuesByAge()]);
 
   const { rect } = state;
   if (points.length >= settings.minNumberOfFingerForGesture && rect != undefined) {
